@@ -3,7 +3,7 @@ package ru.practicum.shareit.request;
 import java.time.LocalDateTime;
 
 import lombok.Data;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.model.User;
 
 /**
  * Модель запроса вещи.
