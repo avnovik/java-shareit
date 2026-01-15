@@ -1,7 +1,14 @@
 package ru.practicum.shareit.user;
 
+import lombok.Data;
+
 /**
- * TODO Sprint add-controllers.
+ * Модель пользователя.
+ * Хранит базовую информацию о пользователе: идентификатор, имя и email.
  */
+@Data
 public class User {
+	private Long id;
+	private String name;
+	private String email;
 }
