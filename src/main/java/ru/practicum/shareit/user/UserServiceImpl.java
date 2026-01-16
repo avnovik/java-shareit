@@ -21,6 +21,12 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserDto create(UserDto userDto) {
+		for (User existing : users.values()) {
+			if (existing.getEmail() != null && existing.getEmail().equals(userDto.getEmail())) {
+				throw new IllegalStateException("Email already in use: " + userDto.getEmail());
+			}
+		}
+
 		User user = new User();
 		Long id = nextId.getAndIncrement();
 		user.setId(id);
@@ -42,6 +48,15 @@ public class UserServiceImpl implements UserService {
 			existing.setName(userDto.getName());
 		}
 		if (userDto.getEmail() != null) {
+			for (Map.Entry<Long, User> entry : users.entrySet()) {
+				Long otherUserId = entry.getKey();
+				User otherUser = entry.getValue();
+				if (!otherUserId.equals(userId)
+							&& otherUser.getEmail() != null
+							&& otherUser.getEmail().equals(userDto.getEmail())) {
+					throw new IllegalStateException("Email already in use: " + userDto.getEmail());
+				}
+			}
 			existing.setEmail(userDto.getEmail());
 		}
 

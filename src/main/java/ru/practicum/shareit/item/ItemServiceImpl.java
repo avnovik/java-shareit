@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.model.User;
 
 /**
@@ -17,11 +18,22 @@ import ru.practicum.shareit.user.model.User;
  */
 @Service
 public class ItemServiceImpl implements ItemService {
+	private final UserService userService;
 	private final Map<Long, Item> items = new ConcurrentHashMap<>();
 	private final AtomicLong nextId = new AtomicLong(1);
 
+	public ItemServiceImpl(UserService userService) {
+		this.userService = userService;
+	}
+
 	@Override
 	public ItemDto create(Long userId, ItemDto itemDto) {
+		try {
+			userService.getById(userId);
+		} catch (IllegalArgumentException e) {
+			throw new IllegalArgumentException("User with id=" + userId + " not found");
+		}
+
 		Item item = new Item();
 		Long id = nextId.getAndIncrement();
 		item.setId(id);

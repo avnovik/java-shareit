@@ -2,6 +2,7 @@ package ru.practicum.shareit.user;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,8 +29,14 @@ public class UserController {
 	}
 
 	@PostMapping
-	public UserDto create(@RequestBody UserDto userDto) {
-		return userService.create(userDto);
+	public UserDto create(@Valid @RequestBody UserDto userDto) {
+		try {
+			return userService.create(userDto);
+		} catch (IllegalArgumentException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		} catch (IllegalStateException e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+		}
 	}
 
 	@PatchMapping("/{userId}")
@@ -38,6 +45,8 @@ public class UserController {
 			return userService.update(userId, userDto);
 		} catch (IllegalArgumentException e) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+		} catch (IllegalStateException e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
 	}
 
