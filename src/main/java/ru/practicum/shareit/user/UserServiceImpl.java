@@ -22,10 +22,10 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserDto create(UserDto userDto) {
-		for (User existing : users.values()) {
-			if (existing.getEmail() != null && existing.getEmail().equals(userDto.getEmail())) {
-				throw new IllegalStateException("Email already in use: " + userDto.getEmail());
-			}
+		boolean emailAlreadyInUse = users.values().stream()
+				.anyMatch(existing -> isEmailInUse(existing, userDto.getEmail()));
+		if (emailAlreadyInUse) {
+			throw new IllegalStateException("Email already in use: " + userDto.getEmail());
 		}
 
 		User user = UserMapper.toUser(userDto);
@@ -50,9 +50,7 @@ public class UserServiceImpl implements UserService {
 			for (Map.Entry<Long, User> entry : users.entrySet()) {
 				Long otherUserId = entry.getKey();
 				User otherUser = entry.getValue();
-				if (!otherUserId.equals(userId)
-							&& otherUser.getEmail() != null
-							&& otherUser.getEmail().equals(userDto.getEmail())) {
+				if (!otherUserId.equals(userId) && isEmailInUse(otherUser, userDto.getEmail())) {
 					throw new IllegalStateException("Email already in use: " + userDto.getEmail());
 				}
 			}
@@ -86,5 +84,9 @@ public class UserServiceImpl implements UserService {
 		if (removed == null) {
 			throw new NotFoundException("User with id=" + userId + " not found");
 		}
+	}
+
+	private boolean isEmailInUse(User user, String email) {
+		return user.getEmail() != null && user.getEmail().equals(email);
 	}
 }

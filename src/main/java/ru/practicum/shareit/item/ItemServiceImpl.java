@@ -1,31 +1,26 @@
 package ru.practicum.shareit.item;
 
-import java.util.ArrayList;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exceptions.NotFoundException;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.UserService;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.springframework.stereotype.Service;
-
-import ru.practicum.shareit.exceptions.NotFoundException;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.UserService;
-import ru.practicum.shareit.user.model.User;
-
 /**
  * In-memory реализация {@link ItemService}.
  */
 @Service
+@RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 	private final UserService userService;
 	private final Map<Long, Item> items = new ConcurrentHashMap<>();
 	private final AtomicLong nextId = new AtomicLong(1);
-
-	public ItemServiceImpl(UserService userService) {
-		this.userService = userService;
-	}
 
 	@Override
 	public ItemDto create(Long userId, ItemDto itemDto) {
@@ -74,14 +69,13 @@ public class ItemServiceImpl implements ItemService {
 
 	@Override
 	public List<ItemDto> getAllByOwner(Long userId) {
-		List<ItemDto> result = new ArrayList<>();
-		for (Item item : items.values()) {
-			Long ownerId = item.getOwner() != null ? item.getOwner().getId() : null;
-			if (userId.equals(ownerId)) {
-				result.add(ItemMapper.toItemDto(item));
-			}
-		}
-		return result;
+		return items.values().stream()
+				.filter(item -> {
+					Long ownerId = item.getOwner() != null ? item.getOwner().getId() : null;
+					return userId.equals(ownerId);
+				})
+				.map(ItemMapper::toItemDto)
+				.toList();
 	}
 
 	@Override
@@ -91,18 +85,14 @@ public class ItemServiceImpl implements ItemService {
 		}
 
 		String query = text.toLowerCase();
-		List<ItemDto> result = new ArrayList<>();
-		for (Item item : items.values()) {
-			if (Boolean.FALSE.equals(item.getAvailable())) {
-				continue;
-			}
-
-			String name = item.getName() != null ? item.getName().toLowerCase() : "";
-			String description = item.getDescription() != null ? item.getDescription().toLowerCase() : "";
-			if (name.contains(query) || description.contains(query)) {
-				result.add(ItemMapper.toItemDto(item));
-			}
-		}
-		return result;
+		return items.values().stream()
+				.filter(item -> !Boolean.FALSE.equals(item.getAvailable()))
+				.filter(item -> {
+					String name = item.getName() != null ? item.getName().toLowerCase() : "";
+					String description = item.getDescription() != null ? item.getDescription().toLowerCase() : "";
+					return name.contains(query) || description.contains(query);
+				})
+				.map(ItemMapper::toItemDto)
+				.toList();
 	}
 }
