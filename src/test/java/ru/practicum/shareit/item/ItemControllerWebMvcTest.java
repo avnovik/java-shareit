@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 @WebMvcTest(ItemController.class)
@@ -112,7 +113,7 @@ class ItemControllerWebMvcTest {
 	@Test
 	@DisplayName("GET /items/{id}: 404 если вещи нет")
 	void getById_notFound() throws Exception {
-		given(itemService.getById(eq(999L))).willThrow(new IllegalArgumentException("Item not found"));
+		given(itemService.getById(eq(999L))).willThrow(new NotFoundException("Item not found"));
 
 		mockMvc.perform(get("/items/{itemId}", 999L))
 				.andExpect(status().isNotFound());

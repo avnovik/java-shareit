@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 
 @WebMvcTest(UserController.class)
@@ -66,7 +67,7 @@ class UserControllerWebMvcTest {
 	@Test
 	@DisplayName("GET /users/{id}: 404 если пользователя нет")
 	void getById_notFound() throws Exception {
-		given(userService.getById(eq(999L))).willThrow(new IllegalArgumentException("User not found"));
+		given(userService.getById(eq(999L))).willThrow(new NotFoundException("User not found"));
 
 		performGetById(999L)
 				.andExpect(status().isNotFound());
@@ -132,7 +133,7 @@ class UserControllerWebMvcTest {
 	@Test
 	@DisplayName("DELETE /users/{id}: 404 если пользователя нет")
 	void delete_notFound() throws Exception {
-		willThrow(new IllegalArgumentException("User not found")).given(userService).delete(eq(999L));
+		willThrow(new NotFoundException("User not found")).given(userService).delete(eq(999L));
 
 		mockMvc.perform(delete("/users/{userId}", 999L))
 				.andExpect(status().isNotFound());

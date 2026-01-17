@@ -1,21 +1,10 @@
 package ru.practicum.shareit.item;
 
-import java.util.List;
-
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
-
+import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
+
+import java.util.List;
 
 /**
  * REST-контроллер для работы с вещами.
@@ -31,33 +20,19 @@ public class ItemController {
 
 	@PostMapping
 	public ItemDto create(@RequestHeader("X-Sharer-User-Id") Long userId, @Valid @RequestBody ItemDto itemDto) {
-		try {
-			return itemService.create(userId, itemDto);
-		} catch (IllegalArgumentException e) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-		}
+		return itemService.create(userId, itemDto);
 	}
 
 	@PatchMapping("/{itemId}")
 	public ItemDto update(@RequestHeader("X-Sharer-User-Id") Long userId,
 							@PathVariable Long itemId,
 							@RequestBody ItemDto itemDto) {
-		try {
-			return itemService.update(userId, itemId, itemDto);
-		} catch (IllegalArgumentException e) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-		} catch (SecurityException e) {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
-		}
+		return itemService.update(userId, itemId, itemDto);
 	}
 
 	@GetMapping("/{itemId}")
 	public ItemDto getById(@PathVariable Long itemId) {
-		try {
-			return itemService.getById(itemId);
-		} catch (IllegalArgumentException e) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-		}
+		return itemService.getById(itemId);
 	}
 
 	@GetMapping

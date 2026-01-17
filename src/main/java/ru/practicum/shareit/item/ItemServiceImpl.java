@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.stereotype.Service;
 
+import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserService;
@@ -28,11 +29,7 @@ public class ItemServiceImpl implements ItemService {
 
 	@Override
 	public ItemDto create(Long userId, ItemDto itemDto) {
-		try {
-			userService.getById(userId);
-		} catch (IllegalArgumentException e) {
-			throw new IllegalArgumentException("User with id=" + userId + " not found");
-		}
+		userService.getById(userId);
 
 		Item item = new Item();
 		Long id = nextId.getAndIncrement();
@@ -53,7 +50,7 @@ public class ItemServiceImpl implements ItemService {
 	public ItemDto update(Long userId, Long itemId, ItemDto itemDto) {
 		Item existing = items.get(itemId);
 		if (existing == null) {
-			throw new IllegalArgumentException("Item with id=" + itemId + " not found");
+			throw new NotFoundException("Item with id=" + itemId + " not found");
 		}
 
 		Long ownerId = existing.getOwner() != null ? existing.getOwner().getId() : null;
@@ -78,7 +75,7 @@ public class ItemServiceImpl implements ItemService {
 	public ItemDto getById(Long itemId) {
 		Item item = items.get(itemId);
 		if (item == null) {
-			throw new IllegalArgumentException("Item with id=" + itemId + " not found");
+			throw new NotFoundException("Item with id=" + itemId + " not found");
 		}
 		return ItemMapper.toItemDto(item);
 	}

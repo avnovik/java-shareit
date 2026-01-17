@@ -1,20 +1,10 @@
 package ru.practicum.shareit.user;
 
-import java.util.List;
-
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
-
+import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
+
+import java.util.List;
 
 /**
  * REST-контроллер для работы с пользователями.
@@ -30,33 +20,17 @@ public class UserController {
 
 	@PostMapping
 	public UserDto create(@Valid @RequestBody UserDto userDto) {
-		try {
-			return userService.create(userDto);
-		} catch (IllegalArgumentException e) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-		} catch (IllegalStateException e) {
-			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
-		}
+		return userService.create(userDto);
 	}
 
 	@PatchMapping("/{userId}")
 	public UserDto update(@PathVariable Long userId, @RequestBody UserDto userDto) {
-		try {
-			return userService.update(userId, userDto);
-		} catch (IllegalArgumentException e) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-		} catch (IllegalStateException e) {
-			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
-		}
+		return userService.update(userId, userDto);
 	}
 
 	@GetMapping("/{userId}")
 	public UserDto getById(@PathVariable Long userId) {
-		try {
-			return userService.getById(userId);
-		} catch (IllegalArgumentException e) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-		}
+		return userService.getById(userId);
 	}
 
 	@GetMapping
@@ -66,10 +40,6 @@ public class UserController {
 
 	@DeleteMapping("/{userId}")
 	public void delete(@PathVariable Long userId) {
-		try {
-			userService.delete(userId);
-		} catch (IllegalArgumentException e) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-		}
+		userService.delete(userId);
 	}
 }

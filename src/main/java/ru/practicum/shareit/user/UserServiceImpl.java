@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.stereotype.Service;
 
+import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
@@ -41,7 +42,7 @@ public class UserServiceImpl implements UserService {
 	public UserDto update(Long userId, UserDto userDto) {
 		User existing = users.get(userId);
 		if (existing == null) {
-			throw new IllegalArgumentException("User with id=" + userId + " not found");
+			throw new NotFoundException("User with id=" + userId + " not found");
 		}
 
 		if (userDto.getName() != null) {
@@ -67,7 +68,7 @@ public class UserServiceImpl implements UserService {
 	public UserDto getById(Long userId) {
 		User user = users.get(userId);
 		if (user == null) {
-			throw new IllegalArgumentException("User with id=" + userId + " not found");
+			throw new NotFoundException("User with id=" + userId + " not found");
 		}
 		return UserMapper.toUserDto(user);
 	}
@@ -85,7 +86,7 @@ public class UserServiceImpl implements UserService {
 	public void delete(Long userId) {
 		User removed = users.remove(userId);
 		if (removed == null) {
-			throw new IllegalArgumentException("User with id=" + userId + " not found");
+			throw new NotFoundException("User with id=" + userId + " not found");
 		}
 	}
 }
