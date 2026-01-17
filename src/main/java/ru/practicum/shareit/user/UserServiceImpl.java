@@ -28,11 +28,9 @@ public class UserServiceImpl implements UserService {
 			}
 		}
 
-		User user = new User();
+		User user = UserMapper.toUser(userDto);
 		Long id = nextId.getAndIncrement();
 		user.setId(id);
-		user.setName(userDto.getName());
-		user.setEmail(userDto.getEmail());
 
 		users.put(id, user);
 		return UserMapper.toUserDto(user);

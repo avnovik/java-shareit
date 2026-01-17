@@ -30,17 +30,9 @@ public class ItemServiceImpl implements ItemService {
 	@Override
 	public ItemDto create(Long userId, ItemDto itemDto) {
 		userService.getById(userId);
-
-		Item item = new Item();
+		Item item = ItemMapper.toItem(itemDto, userId);
 		Long id = nextId.getAndIncrement();
 		item.setId(id);
-		item.setName(itemDto.getName());
-		item.setDescription(itemDto.getDescription());
-		item.setAvailable(itemDto.getAvailable());
-
-		User owner = new User();
-		owner.setId(userId);
-		item.setOwner(owner);
 
 		items.put(id, item);
 		return ItemMapper.toItemDto(item);
