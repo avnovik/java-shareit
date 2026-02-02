@@ -21,7 +21,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ru.practicum.shareit.exceptions.NotFoundException;
+import ru.practicum.shareit.item.dto.ItemBookingDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoWithBookings;
 
 @WebMvcTest(ItemController.class)
 class ItemControllerWebMvcTest {
@@ -43,6 +45,30 @@ class ItemControllerWebMvcTest {
 		dto.setAvailable(available);
 		dto.setOwnerId(ownerId);
 		dto.setRequestId(requestId);
+		return dto;
+	}
+
+	private ItemDtoWithBookings itemDtoWithBookings(Long id, String name, String description, Boolean available, Long ownerId,
+										  Long requestId, Long lastBookingId, Long lastBookerId, Long nextBookingId,
+										  Long nextBookerId) {
+		ItemDtoWithBookings dto = new ItemDtoWithBookings();
+		dto.setId(id);
+		dto.setName(name);
+		dto.setDescription(description);
+		dto.setAvailable(available);
+		dto.setOwnerId(ownerId);
+		dto.setRequestId(requestId);
+
+		ItemBookingDto last = new ItemBookingDto();
+		last.setId(lastBookingId);
+		last.setBookerId(lastBookerId);
+		dto.setLastBooking(last);
+
+		ItemBookingDto next = new ItemBookingDto();
+		next.setId(nextBookingId);
+		next.setBookerId(nextBookerId);
+		dto.setNextBooking(next);
+
 		return dto;
 	}
 
@@ -102,20 +128,53 @@ class ItemControllerWebMvcTest {
 	@DisplayName("GET /items/{id}: возвращает вещь")
 	void getById_returnsItem() throws Exception {
 		ItemDto response = itemDto(1L, "Drill", "Cordless drill", true, 10L, null);
-		given(itemService.getById(eq(1L))).willReturn(response);
+		given(itemService.getById(eq(10L), eq(1L))).willReturn(response);
 
-		mockMvc.perform(get("/items/{itemId}", 1L))
+		mockMvc.perform(get("/items/{itemId}", 1L)
+					.header("X-Sharer-User-Id", 10L))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.id").value(1L))
 				.andExpect(jsonPath("$.name").value("Drill"));
 	}
 
 	@Test
+	@DisplayName("GET /items/{id}: для владельца возвращает lastBooking/nextBooking")
+	void getById_owner_containsBookings() throws Exception {
+		ItemDto response = itemDtoWithBookings(1L, "Drill", "Cordless drill", true, 10L, null,
+										101L, 20L, 102L, 21L);
+		given(itemService.getById(eq(10L), eq(1L))).willReturn(response);
+
+		mockMvc.perform(get("/items/{itemId}", 1L)
+					.header("X-Sharer-User-Id", 10L))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id").value(1L))
+				.andExpect(jsonPath("$.lastBooking.id").value(101L))
+				.andExpect(jsonPath("$.lastBooking.bookerId").value(20L))
+				.andExpect(jsonPath("$.nextBooking.id").value(102L))
+				.andExpect(jsonPath("$.nextBooking.bookerId").value(21L));
+	}
+
+	@Test
+	@DisplayName("GET /items/{id}: для не-владельца не содержит lastBooking/nextBooking")
+	void getById_notOwner_doesNotContainBookings() throws Exception {
+		ItemDto response = itemDto(1L, "Drill", "Cordless drill", true, 10L, null);
+		given(itemService.getById(eq(11L), eq(1L))).willReturn(response);
+
+		mockMvc.perform(get("/items/{itemId}", 1L)
+					.header("X-Sharer-User-Id", 11L))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id").value(1L))
+				.andExpect(jsonPath("$.lastBooking").doesNotExist())
+				.andExpect(jsonPath("$.nextBooking").doesNotExist());
+	}
+
+	@Test
 	@DisplayName("GET /items/{id}: 404 если вещи нет")
 	void getById_notFound() throws Exception {
-		given(itemService.getById(eq(999L))).willThrow(new NotFoundException("Item not found"));
+		given(itemService.getById(eq(10L), eq(999L))).willThrow(new NotFoundException("Item not found"));
 
-		mockMvc.perform(get("/items/{itemId}", 999L))
+		mockMvc.perform(get("/items/{itemId}", 999L)
+					.header("X-Sharer-User-Id", 10L))
 				.andExpect(status().isNotFound());
 	}
 
@@ -123,15 +182,21 @@ class ItemControllerWebMvcTest {
 	@DisplayName("GET /items: возвращает список вещей владельца")
 	void getAllByOwner_returnsList() throws Exception {
 		given(itemService.getAllByOwner(eq(10L))).willReturn(List.of(
-				itemDto(1L, "Drill", "Cordless drill", true, 10L, null),
-				itemDto(2L, "Saw", "Hand saw", true, 10L, null)
+				itemDtoWithBookings(1L, "Drill", "Cordless drill", true, 10L, null,
+										101L, 20L, 102L, 21L),
+				itemDtoWithBookings(2L, "Saw", "Hand saw", true, 10L, null,
+										201L, 22L, 202L, 23L)
 		));
 
 		mockMvc.perform(get("/items")
 						.header("X-Sharer-User-Id", 10L))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$[0].id").value(1L))
-				.andExpect(jsonPath("$[1].id").value(2L));
+				.andExpect(jsonPath("$[0].lastBooking.id").value(101L))
+				.andExpect(jsonPath("$[0].nextBooking.id").value(102L))
+				.andExpect(jsonPath("$[1].id").value(2L))
+				.andExpect(jsonPath("$[1].lastBooking.id").value(201L))
+				.andExpect(jsonPath("$[1].nextBooking.id").value(202L));
 	}
 
 	@Test

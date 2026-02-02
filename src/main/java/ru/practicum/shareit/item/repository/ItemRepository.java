@@ -1,19 +1,28 @@
 package ru.practicum.shareit.item.repository;
 
-import java.util.Collection;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ru.practicum.shareit.item.model.Item;
 
+import java.util.List;
+
 /**
- * Репозиторий для хранения и получения вещей.
+ * JPA-репозиторий для {@link Item}.
+ * Spring Data JPA создаёт реализацию автоматически: доступны CRUD-операции и
+ * запросы из имени методов.
  */
-public interface ItemRepository {
-    Item create(Item item);
+public interface ItemRepository extends JpaRepository<Item, Long> {
+	List<Item> findAllByOwnerId(Long ownerId);
 
-    Item update(Item item);
-
-	Item getById(Long itemId);
-
-	Collection<Item> getAll();
-
-	Item delete(Long itemId);
+	@Query("""
+			select i
+			from Item i
+			where i.available = true
+				and (
+					lower(i.name) like lower(concat('%', :text, '%'))
+					or lower(i.description) like lower(concat('%', :text, '%'))
+				)
+			""")
+	List<Item> searchAvailableByText(@Param("text") String text);
 }
