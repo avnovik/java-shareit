@@ -10,7 +10,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
@@ -18,7 +19,8 @@ import ru.practicum.shareit.user.model.User;
  * Модель вещи.
  * Описывает вещь, которую владелец может сдавать в аренду.
  */
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "items")
 public class Item {

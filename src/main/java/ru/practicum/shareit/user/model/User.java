@@ -6,13 +6,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Модель пользователя.
  * Хранит базовую информацию о пользователе: идентификатор, имя и email.
  */
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "users")
 public class User {

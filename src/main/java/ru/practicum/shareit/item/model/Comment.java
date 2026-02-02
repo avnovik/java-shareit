@@ -11,13 +11,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import ru.practicum.shareit.user.model.User;
 
 /**
  * Комментарий к вещи.
  */
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "comments")
 public class Comment {
