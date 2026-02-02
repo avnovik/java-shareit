@@ -3,6 +3,7 @@ package ru.practicum.shareit.exceptions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -46,6 +47,19 @@ public class ErrorHandler {
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ErrorResponse handleIllegalArgumentException(final IllegalArgumentException e) {
 		log.warn("Некорректный запрос");
+		return new ErrorResponse(e.getMessage());
+	}
+
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorResponse handleTypeMismatch(final MethodArgumentTypeMismatchException e) {
+		String name = e.getName();
+		Object value = e.getValue();
+		if ("state".equals(name)) {
+			log.warn("Некорректное значение параметра state");
+			return new ErrorResponse("Unknown state: " + value);
+		}
+		log.warn("Некорректный параметр запроса");
 		return new ErrorResponse(e.getMessage());
 	}
 }
