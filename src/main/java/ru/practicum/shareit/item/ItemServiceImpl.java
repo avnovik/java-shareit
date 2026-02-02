@@ -90,7 +90,6 @@ public class ItemServiceImpl implements ItemService {
 		List<ItemDto> items = itemRepository.findAllByOwnerId(userId).stream()
 				.map(ItemMapper::toItemDto)
 				.map(this::addBookingsAndCommentsForOwner)
-				.map(dto -> (ItemDto) dto)
 				.toList();
 		log.debug("returned itemsCount={} ownerId={}", items.size(), userId);
 		return items;
@@ -134,7 +133,7 @@ public class ItemServiceImpl implements ItemService {
 	}
 
 	private ItemDto addBookingsAndCommentsForOwner(ItemDto itemDto) {
-		ItemDtoWithBookingsAndComments dto = new ItemDtoWithBookingsAndComments();
+		ItemDto dto = new ItemDto();
 		dto.setId(itemDto.getId());
 		dto.setName(itemDto.getName());
 		dto.setDescription(itemDto.getDescription());
@@ -162,7 +161,7 @@ public class ItemServiceImpl implements ItemService {
 	}
 
 	private ItemDto addComments(ItemDto itemDto) {
-		ItemDtoWithComments dto = new ItemDtoWithComments();
+		ItemDto dto = new ItemDto();
 		dto.setId(itemDto.getId());
 		dto.setName(itemDto.getName());
 		dto.setDescription(itemDto.getDescription());

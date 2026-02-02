@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -23,7 +24,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemBookingDto;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemDtoWithBookings;
 
 @WebMvcTest(ItemController.class)
 class ItemControllerWebMvcTest {
@@ -45,19 +45,21 @@ class ItemControllerWebMvcTest {
 		dto.setAvailable(available);
 		dto.setOwnerId(ownerId);
 		dto.setRequestId(requestId);
+		dto.setLastBooking(null);
+		dto.setNextBooking(null);
 		return dto;
 	}
 
-	private ItemDtoWithBookings itemDtoWithBookings(Long id, String name, String description, Boolean available, Long ownerId,
-										  Long requestId, Long lastBookingId, Long lastBookerId, Long nextBookingId,
-										  Long nextBookerId) {
-		ItemDtoWithBookings dto = new ItemDtoWithBookings();
+	private ItemDto itemDtoWithBookings(Long id, String name, String description, Boolean available, Long ownerId,
+										 Long requestId,
+										 Long lastBookingId, Long lastBookerId,
+										 Long nextBookingId, Long nextBookerId) {
+		ItemDto dto = itemDto(id, name, description, available, ownerId, requestId);
 		dto.setId(id);
 		dto.setName(name);
 		dto.setDescription(description);
 		dto.setAvailable(available);
 		dto.setOwnerId(ownerId);
-		dto.setRequestId(requestId);
 
 		ItemBookingDto last = new ItemBookingDto();
 		last.setId(lastBookingId);
@@ -68,7 +70,6 @@ class ItemControllerWebMvcTest {
 		next.setId(nextBookingId);
 		next.setBookerId(nextBookerId);
 		dto.setNextBooking(next);
-
 		return dto;
 	}
 
@@ -164,8 +165,8 @@ class ItemControllerWebMvcTest {
 					.header("X-Sharer-User-Id", 11L))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.id").value(1L))
-				.andExpect(jsonPath("$.lastBooking").doesNotExist())
-				.andExpect(jsonPath("$.nextBooking").doesNotExist());
+				.andExpect(jsonPath("$.lastBooking").value(nullValue()))
+				.andExpect(jsonPath("$.nextBooking").value(nullValue()));
 	}
 
 	@Test
