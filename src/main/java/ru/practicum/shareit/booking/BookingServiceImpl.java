@@ -49,10 +49,6 @@ public class BookingServiceImpl implements BookingService {
 
 		LocalDateTime start = bookingCreateDto.getStart();
 		LocalDateTime end = bookingCreateDto.getEnd();
-		LocalDateTime now = LocalDateTime.now();
-		if (start.isBefore(now) || end.isBefore(now)) {
-			throw new IllegalArgumentException("start and end must be in the future");
-		}
 		if (!start.isBefore(end)) {
 			throw new IllegalArgumentException("start must be before end");
 		}
