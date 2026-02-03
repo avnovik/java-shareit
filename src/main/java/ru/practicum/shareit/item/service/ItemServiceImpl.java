@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +10,8 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.dto.*;
+import ru.practicum.shareit.item.mapper.CommentMapper;
+import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
@@ -122,11 +124,7 @@ public class ItemServiceImpl implements ItemService {
 					+ " has no finished approved booking for item with id=" + itemId);
 		}
 
-		Comment comment = new Comment();
-		comment.setText(commentCreateDto.getText());
-		comment.setItem(item);
-		comment.setAuthor(author);
-		comment.setCreated(now);
+		Comment comment = CommentMapper.toComment(commentCreateDto, item, author, now);
 
 		Comment saved = commentRepository.save(comment);
 		log.debug("comment added commentId={} itemId={} authorId={}", saved.getId(), itemId, userId);

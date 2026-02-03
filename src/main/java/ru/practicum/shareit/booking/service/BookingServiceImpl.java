@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import ru.practicum.shareit.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
@@ -54,16 +55,11 @@ public class BookingServiceImpl implements BookingService {
 			throw new IllegalArgumentException("start must be before end");
 		}
 
-		Booking booking = new Booking();
-		booking.setStart(start);
-		booking.setEnd(end);
-		booking.setItem(item);
-		booking.setBooker(booker);
-		booking.setStatus(BookingStatus.WAITING);
+		Booking booking = BookingMapper.toBooking(bookingCreateDto, item, booker, BookingStatus.WAITING);
 
 		Booking saved = bookingRepository.save(booking);
 		log.debug("created bookingId={} itemId={} bookerId={}", saved.getId(), itemId, userId);
-		return toDto(saved);
+		return BookingMapper.toBookingDto(saved);
 	}
 
 	@Override
@@ -83,7 +79,7 @@ public class BookingServiceImpl implements BookingService {
 		booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
 		Booking saved = bookingRepository.save(booking);
 		log.debug("approved bookingId={} ownerId={} status={}", bookingId, userId, saved.getStatus());
-		return toDto(saved);
+		return BookingMapper.toBookingDto(saved);
 	}
 
 	@Override
@@ -97,7 +93,7 @@ public class BookingServiceImpl implements BookingService {
 			throw new SecurityException("Only owner or booker can view booking with id=" + bookingId);
 		}
 
-		BookingDto dto = toDto(booking);
+		BookingDto dto = BookingMapper.toBookingDto(booking);
 		log.debug("returned bookingId={} forUserId={}", bookingId, userId);
 		return dto;
 	}
@@ -121,7 +117,7 @@ public class BookingServiceImpl implements BookingService {
 		};
 
 		List<BookingDto> dtos = bookings.stream()
-				.map(this::toDto)
+				.map(BookingMapper::toBookingDto)
 				.toList();
 		log.debug("returned bookings forBookerId={} state={} count={}", userId, safeState, dtos.size());
 		return dtos;
@@ -146,30 +142,9 @@ public class BookingServiceImpl implements BookingService {
 		};
 
 		List<BookingDto> dtos = bookings.stream()
-				.map(this::toDto)
+				.map(BookingMapper::toBookingDto)
 				.toList();
 		log.debug("returned bookings forOwnerId={} state={} count={}", userId, safeState, dtos.size());
 		return dtos;
-	}
-
-	private BookingDto toDto(Booking booking) {
-		BookingDto dto = new BookingDto();
-		dto.setId(booking.getId());
-		dto.setStart(booking.getStart());
-		dto.setEnd(booking.getEnd());
-		dto.setStatus(booking.getStatus());
-
-		if (booking.getItem() != null) {
-			BookingDto.ItemInfo item = new BookingDto.ItemInfo();
-			item.setId(booking.getItem().getId());
-			item.setName(booking.getItem().getName());
-			dto.setItem(item);
-		}
-		if (booking.getBooker() != null) {
-			BookingDto.BookerInfo booker = new BookingDto.BookerInfo();
-			booker.setId(booking.getBooker().getId());
-			dto.setBooker(booker);
-		}
-		return dto;
 	}
 }

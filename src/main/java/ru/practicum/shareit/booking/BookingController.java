@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import ru.practicum.shareit.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.BookingState;
+import ru.practicum.shareit.booking.service.BookingService;
 
 /**
  * REST-контроллер для операций с бронированиями.

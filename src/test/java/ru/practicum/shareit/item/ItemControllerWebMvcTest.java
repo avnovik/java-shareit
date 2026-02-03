@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemBookingDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.service.ItemService;
 
 @WebMvcTest(ItemController.class)
 class ItemControllerWebMvcTest {
