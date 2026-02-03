@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
@@ -153,7 +154,8 @@ public class ItemServiceImpl implements ItemService {
 				.map(this::toItemBookingDto)
 				.orElse(null));
 
-		dto.setComments(commentRepository.findAllByItemIdOrderByCreatedDesc(dto.getId()).stream()
+		Sort newestFirst = Sort.by(Sort.Direction.DESC, "created");
+		dto.setComments(commentRepository.findAllByItemId(dto.getId(), newestFirst).stream()
 				.map(CommentMapper::toCommentDto)
 				.toList());
 
@@ -169,7 +171,8 @@ public class ItemServiceImpl implements ItemService {
 		dto.setOwnerId(itemDto.getOwnerId());
 		dto.setRequestId(itemDto.getRequestId());
 
-		dto.setComments(commentRepository.findAllByItemIdOrderByCreatedDesc(dto.getId()).stream()
+		Sort newestFirst = Sort.by(Sort.Direction.DESC, "created");
+		dto.setComments(commentRepository.findAllByItemId(dto.getId(), newestFirst).stream()
 				.map(CommentMapper::toCommentDto)
 				.toList());
 		return dto;

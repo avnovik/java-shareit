@@ -5,6 +5,7 @@ import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import ru.practicum.shareit.booking.dto.BookingCreateDto;
@@ -108,20 +109,21 @@ public class BookingServiceImpl implements BookingService {
 
 		BookingState safeState = state != null ? state : BookingState.ALL;
 		LocalDateTime now = LocalDateTime.now();
+		Sort newestFirst = Sort.by(Sort.Direction.DESC, "start");
 
 		List<Booking> bookings = switch (safeState) {
-			case ALL -> bookingRepository.findAllByBookerIdOrderByStartDesc(userId);
-			case CURRENT -> bookingRepository.findCurrentByBookerId(userId, now);
-			case PAST -> bookingRepository.findAllByBookerIdAndEndBeforeOrderByStartDesc(userId, now);
-			case FUTURE -> bookingRepository.findAllByBookerIdAndStartAfterOrderByStartDesc(userId, now);
-			case WAITING -> bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING);
-			case REJECTED -> bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED);
+			case ALL -> bookingRepository.findAllByBookerId(userId, newestFirst);
+			case CURRENT -> bookingRepository.findCurrentByBookerId(userId, now, newestFirst);
+			case PAST -> bookingRepository.findAllByBookerIdAndEndBefore(userId, now, newestFirst);
+			case FUTURE -> bookingRepository.findAllByBookerIdAndStartAfter(userId, now, newestFirst);
+			case WAITING -> bookingRepository.findAllByBookerIdAndStatus(userId, BookingStatus.WAITING, newestFirst);
+			case REJECTED -> bookingRepository.findAllByBookerIdAndStatus(userId, BookingStatus.REJECTED, newestFirst);
 		};
 
 		List<BookingDto> dtos = bookings.stream()
 				.map(this::toDto)
 				.toList();
-		log.debug("returned bookingsCount={} forBookerId={} state={}", dtos.size(), userId, safeState);
+		log.debug("returned bookings forBookerId={} state={} count={}", userId, safeState, dtos.size());
 		return dtos;
 	}
 
@@ -132,20 +134,21 @@ public class BookingServiceImpl implements BookingService {
 
 		BookingState safeState = state != null ? state : BookingState.ALL;
 		LocalDateTime now = LocalDateTime.now();
+		Sort newestFirst = Sort.by(Sort.Direction.DESC, "start");
 
 		List<Booking> bookings = switch (safeState) {
-			case ALL -> bookingRepository.findAllByItemOwnerIdOrderByStartDesc(userId);
-			case CURRENT -> bookingRepository.findCurrentByOwnerId(userId, now);
-			case PAST -> bookingRepository.findAllByItemOwnerIdAndEndBeforeOrderByStartDesc(userId, now);
-			case FUTURE -> bookingRepository.findAllByItemOwnerIdAndStartAfterOrderByStartDesc(userId, now);
-			case WAITING -> bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING);
-			case REJECTED -> bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED);
+			case ALL -> bookingRepository.findAllByItemOwnerId(userId, newestFirst);
+			case CURRENT -> bookingRepository.findCurrentByOwnerId(userId, now, newestFirst);
+			case PAST -> bookingRepository.findAllByItemOwnerIdAndEndBefore(userId, now, newestFirst);
+			case FUTURE -> bookingRepository.findAllByItemOwnerIdAndStartAfter(userId, now, newestFirst);
+			case WAITING -> bookingRepository.findAllByItemOwnerIdAndStatus(userId, BookingStatus.WAITING, newestFirst);
+			case REJECTED -> bookingRepository.findAllByItemOwnerIdAndStatus(userId, BookingStatus.REJECTED, newestFirst);
 		};
 
 		List<BookingDto> dtos = bookings.stream()
 				.map(this::toDto)
 				.toList();
-		log.debug("returned bookingsCount={} forOwnerId={} state={}", dtos.size(), userId, safeState);
+		log.debug("returned bookings forOwnerId={} state={} count={}", userId, safeState, dtos.size());
 		return dtos;
 	}
 
