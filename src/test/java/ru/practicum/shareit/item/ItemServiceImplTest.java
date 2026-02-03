@@ -5,20 +5,43 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.repository.InMemoryItemRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.item.service.ItemServiceImpl;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.InMemoryUserRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+@SpringBootTest
+@ActiveProfiles("test")
+@Transactional
 class ItemServiceImplTest {
 
-	private final UserRepository userRepository = new InMemoryUserRepository();
-	private final ItemRepository itemRepository = new InMemoryItemRepository();
-	private final ItemServiceImpl itemService = new ItemServiceImpl(userRepository, itemRepository);
+	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
+	private ItemRepository itemRepository;
+
+	@Autowired
+	private BookingRepository bookingRepository;
+
+	@Autowired
+	private ru.practicum.shareit.item.repository.CommentRepository commentRepository;
+
+	private ItemServiceImpl itemService;
+
+	@BeforeEach
+	void setUp() {
+		itemService = new ItemServiceImpl(userRepository, itemRepository, bookingRepository, commentRepository);
+	}
 
 	private ItemDto itemDto(Long id, String name, String description, Boolean available) {
 		ItemDto dto = new ItemDto();
@@ -35,7 +58,7 @@ class ItemServiceImplTest {
 		User owner = new User();
 		owner.setName("Owner");
 		owner.setEmail("owner@email");
-		Long ownerId = userRepository.create(owner).getId();
+		Long ownerId = userRepository.save(owner).getId();
 
 		ItemDto request = itemDto(null, "Drill", "Cordless drill", true);
 
@@ -54,7 +77,7 @@ class ItemServiceImplTest {
 		User owner = new User();
 		owner.setName("Owner");
 		owner.setEmail("owner@email");
-		Long ownerId = userRepository.create(owner).getId();
+		Long ownerId = userRepository.save(owner).getId();
 
 		ItemDto created = itemService.create(ownerId, itemDto(null, "Old", "Old desc", true));
 
@@ -74,7 +97,7 @@ class ItemServiceImplTest {
 		User owner = new User();
 		owner.setName("Owner");
 		owner.setEmail("owner@email");
-		Long ownerId = userRepository.create(owner).getId();
+		Long ownerId = userRepository.save(owner).getId();
 
 		ItemDto created = itemService.create(ownerId, itemDto(null, "Old", "Old desc", true));
 

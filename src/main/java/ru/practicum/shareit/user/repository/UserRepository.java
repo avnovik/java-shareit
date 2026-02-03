@@ -1,24 +1,15 @@
 package ru.practicum.shareit.user.repository;
 
-import java.util.Collection;
-
+import org.springframework.data.jpa.repository.JpaRepository;
 import ru.practicum.shareit.user.model.User;
 
 /**
- * Репозиторий для хранения и получения пользователей.
+ * JPA-репозиторий для {@link User}.
+ * Spring Data JPA создаёт реализацию автоматически: доступны CRUD-операции и
+ * запросы из имени методов.
  */
-public interface UserRepository {
-    User create(User user);
-
-    User update(User user);
-
-    User getById(Long userId);
-
-	Collection<User> getAll();
-
-	User delete(Long userId);
-
+public interface UserRepository extends JpaRepository<User, Long> {
 	boolean existsByEmail(String email);
 
-	boolean existsByEmailExcludingId(String email, Long excludedUserId);
+	boolean existsByEmailAndIdNot(String email, Long id);
 }

@@ -1,5 +1,7 @@
 package ru.practicum.shareit.item.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -9,41 +11,33 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
-import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 /**
- * Модель вещи.
- * Описывает вещь, которую владелец может сдавать в аренду.
+ * Комментарий к вещи.
  */
 @Getter
 @Setter
 @Entity
-@Table(name = "items")
-public class Item {
+@Table(name = "comments")
+public class Comment {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false)
-	private String name;
-
 	@Column(nullable = false, length = 1024)
-	private String description;
-
-	@Column(name = "is_available", nullable = false)
-	private Boolean available;
+	private String text;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "owner_id", nullable = false)
-	private User owner;
+	@JoinColumn(name = "item_id", nullable = false)
+	private Item item;
 
-	@Column(name = "request_id")
-	private Long requestId;
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "author_id", nullable = false)
+	private User author;
 
-	@Transient
-	private ItemRequest request;
+	@Column(nullable = false)
+	private LocalDateTime created;
 }

@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * DTO вещи.
  * Используется для обмена данными о вещи через REST.
@@ -22,4 +24,7 @@ public class ItemDto {
 	private Boolean available;
 	private Long ownerId;
 	private Long requestId;
+	private ItemBookingDto lastBooking;
+	private ItemBookingDto nextBooking;
+	private List<CommentDto> comments;
 }
