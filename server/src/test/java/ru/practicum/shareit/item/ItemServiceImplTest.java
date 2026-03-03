@@ -16,6 +16,7 @@ import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -34,13 +35,16 @@ class ItemServiceImplTest {
 	private BookingRepository bookingRepository;
 
 	@Autowired
+	private ItemRequestRepository itemRequestRepository;
+
+	@Autowired
 	private ru.practicum.shareit.item.repository.CommentRepository commentRepository;
 
 	private ItemServiceImpl itemService;
 
 	@BeforeEach
 	void setUp() {
-		itemService = new ItemServiceImpl(userRepository, itemRepository, bookingRepository, commentRepository);
+		itemService = new ItemServiceImpl(userRepository, itemRepository, itemRequestRepository, bookingRepository, commentRepository);
 	}
 
 	private ItemDto itemDto(Long id, String name, String description, Boolean available) {

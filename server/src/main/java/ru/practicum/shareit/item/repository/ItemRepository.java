@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
+import java.util.Collection;
 
 /**
  * JPA-репозиторий для {@link Item}.
@@ -14,6 +15,10 @@ import java.util.List;
  */
 public interface ItemRepository extends JpaRepository<Item, Long> {
 	List<Item> findAllByOwnerId(Long ownerId);
+
+	List<Item> findAllByRequestId(Long requestId);
+
+	List<Item> findAllByRequestIdIn(Collection<Long> requestIds);
 
 	@Query("""
 			select i
