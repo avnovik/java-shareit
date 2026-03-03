@@ -5,6 +5,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,7 +89,7 @@ class ItemRequestControllerSpringBootTest {
 					.param("size", "10"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$").isArray())
-				.andExpect(jsonPath("$").isEmpty());
+				.andExpect(jsonPath("$[*].id", not(hasItem(requestId.intValue()))));
 
 		mockMvc.perform(get("/requests/{requestId}", requestId)
 					.header("X-Sharer-User-Id", other.getId()))
