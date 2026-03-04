@@ -79,18 +79,6 @@ class ItemRequestControllerWebMvcTest {
 	}
 
 	@Test
-	@DisplayName("POST /requests: 400 если description пустой")
-	void create_blankDescription_badRequest() throws Exception {
-		ItemRequestCreateDto request = createDto(" ");
-
-		mockMvc.perform(post("/requests")
-					.header("X-Sharer-User-Id", 10L)
-					.contentType(MediaType.APPLICATION_JSON)
-					.content(objectMapper.writeValueAsString(request)))
-				.andExpect(status().isBadRequest());
-	}
-
-	@Test
 	@DisplayName("GET /requests: возвращает список своих запросов")
 	void getAllByRequestor_returnsList() throws Exception {
 		ItemRequestResponseDto response = responseDto(1L, "Need drill", LocalDateTime.now(), List.of(

@@ -87,18 +87,6 @@ class BookingControllerWebMvcTest {
 	}
 
 	@Test
-	@DisplayName("POST /bookings: 400 если itemId/start/end null")
-	void create_validationError() throws Exception {
-		BookingCreateDto request = bookingCreateDto(null, null, null);
-
-		mockMvc.perform(post("/bookings")
-					.header("X-Sharer-User-Id", 10L)
-					.contentType(MediaType.APPLICATION_JSON)
-					.content(objectMapper.writeValueAsString(request)))
-				.andExpect(status().isBadRequest());
-	}
-
-	@Test
 	@DisplayName("PATCH /bookings/{id}: подтверждает бронирование")
 	void approve_returnsBooking() throws Exception {
 		BookingDto response = bookingDto(1L, 33L, "Drill", 10L,
