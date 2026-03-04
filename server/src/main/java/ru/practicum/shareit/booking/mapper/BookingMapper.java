@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking.mapper;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -15,10 +14,10 @@ public class BookingMapper {
 	/**
 	 * Преобразует {@link BookingCreateDto} в {@link Booking}.
 	 */
-	public static Booking toBooking(@NotNull BookingCreateDto dto,
-							  @NotNull Item item,
-							  @NotNull User booker,
-							  @NotNull BookingStatus status) {
+	public static Booking toBooking(BookingCreateDto dto,
+							  Item item,
+							  User booker,
+							  BookingStatus status) {
 		Booking booking = new Booking();
 		booking.setStart(dto.getStart());
 		booking.setEnd(dto.getEnd());
@@ -31,7 +30,7 @@ public class BookingMapper {
 	/**
 	 * Преобразует {@link Booking} в {@link BookingDto}.
 	 */
-	public static BookingDto toBookingDto(@NotNull Booking booking) {
+	public static BookingDto toBookingDto(Booking booking) {
 		BookingDto dto = new BookingDto();
 		dto.setId(booking.getId());
 		dto.setStart(booking.getStart());

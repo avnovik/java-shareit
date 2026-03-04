@@ -1,7 +1,5 @@
 package ru.practicum.shareit.booking;
 
-import jakarta.validation.Valid;
-
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
@@ -33,7 +31,7 @@ public class BookingController {
 
 	@PostMapping
 	public BookingDto create(@RequestHeader("X-Sharer-User-Id") Long userId,
-						 @Valid @RequestBody BookingCreateDto bookingCreateDto) {
+						 @RequestBody BookingCreateDto bookingCreateDto) {
 		log.debug("POST /bookings userId={}", userId);
 		return bookingService.create(userId, bookingCreateDto);
 	}

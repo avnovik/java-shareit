@@ -1,8 +1,6 @@
 package ru.practicum.shareit.item.mapper;
 
 import java.time.LocalDateTime;
-
-import jakarta.validation.constraints.NotNull;
 import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.item.dto.CommentCreateDto;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -16,7 +14,7 @@ public class CommentMapper {
 	/**
 	 * Преобразует {@link Comment} в {@link CommentDto}.
 	 */
-	public static CommentDto toCommentDto(@NotNull Comment comment) {
+	public static CommentDto toCommentDto(Comment comment) {
 		CommentDto dto = new CommentDto();
 		dto.setId(comment.getId());
 		dto.setText(comment.getText());
@@ -28,10 +26,10 @@ public class CommentMapper {
 	/**
 	 * Преобразует {@link CommentCreateDto} в {@link Comment}.
 	 */
-	public static Comment toComment(@NotNull CommentCreateDto dto,
-							  @NotNull Item item,
-							  @NotNull User author,
-							  @NotNull LocalDateTime created) {
+	public static Comment toComment(CommentCreateDto dto,
+							  Item item,
+							  User author,
+							  LocalDateTime created) {
 		Comment comment = new Comment();
 		comment.setText(dto.getText());
 		comment.setItem(item);

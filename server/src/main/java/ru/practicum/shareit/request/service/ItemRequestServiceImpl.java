@@ -72,12 +72,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
 		int safeFrom = from != null ? from : 0;
 		int safeSize = size != null ? size : 10;
-		if (safeFrom < 0) {
-			throw new IllegalArgumentException("from must be >= 0");
-		}
-		if (safeSize <= 0) {
-			throw new IllegalArgumentException("size must be > 0");
-		}
 
 		int page = safeFrom / safeSize;
 		int offsetInPage = safeFrom % safeSize;
