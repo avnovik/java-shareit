@@ -17,7 +17,15 @@ ShareIt — учебный сервис для шеринга вещей: пол
 
 ## Архитектура
 
-Слои приложения:
+Проект состоит из двух модулей:
+- `gateway` — входная точка (REST API), выполняет валидацию входящих запросов и проксирует их в `server`.
+- `server` — бизнес-логика и работа с базой данных (Spring Data JPA).
+
+Порты по умолчанию:
+- `gateway`: `8080`
+- `server`: `9090`
+
+Слои приложения (внутри `server`):
 - Controller: REST API
 - Service: бизнес-логика
 - Repository: Spring Data JPA (PostgreSQL / H2 для тестов)
@@ -25,6 +33,8 @@ ShareIt — учебный сервис для шеринга вещей: пол
 Обработка ошибок централизована через `@RestControllerAdvice`.
 
 ## REST API
+
+Все запросы выполняются в `gateway` и проксируются в `server`.
 
 Для методов, работающих от имени пользователя, используется заголовок:
 - `X-Sharer-User-Id: <userId>`
@@ -70,6 +80,15 @@ ShareIt — учебный сервис для шеринга вещей: пол
 - `WAITING` — ожидают подтверждения владельцем
 - `REJECTED` — отклонены владельцем
 
+### Запросы вещей: `/requests`
+
+| Метод | Endpoint | Описание |
+| --- | --- | --- |
+| `POST` | `/requests` | Создать запрос вещи |
+| `GET` | `/requests` | Получить список запросов текущего пользователя |
+| `GET` | `/requests/all?from={from}&size={size}` | Получить список запросов других пользователей (пагинация) |
+| `GET` | `/requests/{requestId}` | Получить запрос по id |
+
 ## Технологии
 
 - Java 21
@@ -79,7 +98,7 @@ ShareIt — учебный сервис для шеринга вещей: пол
 - H2 (тестовая БД)
 - Maven
 - Lombok
-- Jakarta Validation
+- Jakarta Validation (валидация входящих запросов на стороне `gateway`)
 - JUnit 5, Spring Boot Test, MockMvc
 
 ## Как запустить
@@ -91,12 +110,12 @@ ShareIt — учебный сервис для шеринга вещей: пол
 
 ### Подготовка PostgreSQL
 
-По умолчанию приложение ожидает настройки из `src/main/resources/application.properties`:
+По умолчанию `server` ожидает настройки из `server/src/main/resources/application.properties`:
 - URL: `jdbc:postgresql://localhost:5432/shareit`
 - user: `shareit`
 - password: `shareit`
 
-База данных поднимается через Docker Compose (см. `compose.yaml`).
+База данных поднимается через Docker Compose (см. `docker-compose.yml`).
 
 Запуск PostgreSQL:
 
@@ -126,11 +145,11 @@ docker logs -f shareit-db
 docker compose down
 ```
 
-Таблицы создаются автоматически при старте приложения из `src/main/resources/schema.sql`.
+Таблицы создаются автоматически при старте приложения из `server/src/main/resources/schema.sql`.
 
 ### Сборка и тесты
 
-Тесты используют H2 (настройки в `src/main/resources/application-test.properties`).
+Тесты используют H2 (настройки в `server/src/main/resources/application-test.properties`).
 
 ```bash
 mvn test
@@ -144,16 +163,44 @@ H2-консоль включена в тестовом профиле:
 Пример запуска приложения с профилем `test` (для доступа к H2 Console):
 
 ```bash
-mvn spring-boot:run -Dspring-boot.run.profiles=test
+mvn -pl server spring-boot:run -Dspring-boot.run.profiles=test
 ```
 
 ### Запуск приложения
 
 ```bash
-mvn spring-boot:run
+mvn -pl server spring-boot:run
+```
+
+Запуск `gateway`:
+
+`gateway` проксирует запросы в `server` по адресу из `gateway/src/main/resources/application.properties`:
+- `shareit-server.url=http://localhost:9090`
+
+```bash
+mvn -pl gateway spring-boot:run
 ```
 
 ## Качество кода
+
+### Покрытие тестами (JaCoCo)
+
+В проекте настроена проверка покрытия тестами (JaCoCo). В CI/CD пайплайне проверка выполняется для модуля `server`.
+
+Проверка тестов и порогов покрытия:
+
+```bash
+mvn -pl server test jacoco:check
+```
+
+Сгенерировать HTML-отчёт:
+
+```bash
+mvn -pl server test jacoco:report
+```
+
+Отчёт будет доступен в файле:
+- `server/target/site/jacoco/index.html`
 
 ### Checkstyle (если включён)
 
